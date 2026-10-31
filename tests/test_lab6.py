@@ -1,34 +1,50 @@
-"""
-Юніт-тести для Лабораторної роботи № 6.
+"""Модульні тести для пакета user_info (Варіант 8)."""
 
-Студенти повинні доповнити цей файл тестами для своїх рішень.
-"""
+import os
+import sys
 import unittest
+from unittest.mock import patch
 
-# TODO: Імпортуйте функції для тестування з вашого пакета
-# from src.назва_вашого_пакета.назва_модуля import ваша_функція
+# Додаємо шлях до директорії src для імпорту пакета user_info
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
-class TestLab6(unittest.TestCase):
-
-    def test_example(self):
-        """Приклад тестового випадку."""
-        self.assertEqual(2 + 2, 4)
-
-    # TODO: Додайте тестові випадки для функцій у вашому пакеті.
-    # def test_your_function(self):
-    #     """Тестовий випадок для вашої_функції."""
-    #     # Приклад перевірки
-    #     self.assertEqual(ваша_функція(вхідні_дані), очікуваний_результат)
-
-    # def test_another_function_with_edge_cases(self):
-    #     """Тестовий випадок для іншої_функції з граничними випадками."""
-    #     # Тест з нулем
-    #     self.assertEqual(інша_функція(0), очікуваний_для_нуля)
-    #     # Тест з від'ємним числом
-    #     self.assertEqual(інша_функція(-5), очікуваний_для_від'ємного)
-    #     # Тест з великим числом
-    #     self.assertEqual(інша_функція(1000), очікуваний_для_великого)
+from user_info.input import get_name, get_age
+from user_info.output import greet_user
 
 
-if __name__ == '__main__':
+class TestUserInfoPackage(unittest.TestCase):
+    """Клас для тестування функцій модулів input та output пакета user_info."""
+
+    def test_get_name_with_argument(self):
+        """Тест отримання імені при передачі аргументу напряму."""
+        self.assertEqual(get_name("Артем"), "Артем")
+        self.assertEqual(get_name("  Олександр  "), "Олександр")
+
+    @patch('builtins.input', return_value="Андрій")
+    def test_get_name_from_input(self, mock_input):
+        """Тест отримання імені через функцію input()."""
+        self.assertEqual(get_name(), "Андрій")
+
+    def test_get_age_with_argument(self):
+        """Тест отримання віку при передачі числа або рядка."""
+        self.assertEqual(get_age(19), 19)
+        self.assertEqual(get_age("20"), 20)
+
+    @patch('builtins.input', return_value="21")
+    def test_get_age_from_input(self, mock_input):
+        """Тест отримання віку через функцію input()."""
+        self.assertEqual(get_age(), 21)
+
+    def test_get_age_negative_raises_error(self):
+        """Тест перевірки виклику помилки ValueError для від'ємного віку."""
+        with self.assertRaises(ValueError):
+            get_age(-5)
+
+    def test_greet_user(self):
+        """Тест форматування привітання користувача."""
+        result = greet_user("Артем", 19)
+        self.assertEqual(result, "Привіт, Артем! Тобі 19 років.")
+
+
+if __name__ == "__main__":
     unittest.main()
